@@ -10,7 +10,7 @@ local player = Players.LocalPlayer
 local searchTerm = ""
 local NORMAL_TEXT = "grab"
 
--- Helper Function (To avoid repeating the same code 5 times)
+-- Updated Helper Function with Retry Logic
 local function stealBrainrot(targetSmallText)
     local character = player.Character
     local hrp = character and character:FindFirstChild("HumanoidRootPart")
@@ -19,6 +19,7 @@ local function stealBrainrot(targetSmallText)
     local originalCFrame = hrp.CFrame
     local matches = {}
 
+    -- Find matching prompts
     for _, obj in ipairs(workspace:GetDescendants()) do
         if obj:IsA("ProximityPrompt") then
             if string.lower(obj.ObjectText) == string.lower(targetSmallText) and string.lower(obj.ActionText) == NORMAL_TEXT then
@@ -32,19 +33,37 @@ local function stealBrainrot(targetSmallText)
         local targetPart = randomPrompt.Parent
         if not targetPart:IsA("BasePart") then return end
 
+        -- Smooth TP to target
         local tween = TweenService:Create(hrp, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {CFrame = targetPart.CFrame * CFrame.new(0, 3, 0)})
         tween:Play()
         tween.Completed:Wait()
 
+        -- Freeze character
         hrp.Anchored = true
-        task.wait(0.1)
-        randomPrompt:InputHoldBegin()
-        task.wait(randomPrompt.HoldDuration)
-        randomPrompt:InputHoldEnd()
         
-        task.wait(1)
+        -- Retry Loop: Tries 2 times
+        for i = 1, 2 do
+            print("Attempting " .. targetSmallText .. " - Try #" .. i)
+            
+            task.wait(0.2)
+            randomPrompt:InputHoldBegin()
+            task.wait(randomPrompt.HoldDuration)
+            randomPrompt:InputHoldEnd()
+            
+            -- Wait a moment to see if the item was taken/prompt disappeared
+            task.wait(0.5)
+            
+            -- If the prompt is gone or disabled, we succeeded, so stop retrying
+            if not randomPrompt.Parent or not randomPrompt.Enabled then
+                break
+            end
+        end
+        
+        -- Final buffer before returning
+        task.wait(0.5)
         hrp.Anchored = false
         hrp.CFrame = originalCFrame
+        print("Completed sequence for: " .. targetSmallText)
     else
         print("Not found: " .. targetSmallText)
     end
@@ -55,8 +74,12 @@ local Tab = Window:NewTab("Stealing")
 local SectionSteal = Tab:NewSection("Steals Brainrots")
 SectionSteal:NewLabel("BETA VERSION")
 
-SectionSteal:NewTextBox("BRAINROT NAME", "Type here the brainrot to search", function(txt)
+-- TextBox now triggers on Enter, but also saves text for the button
+SectionSteal:NewTextBox("BRAINROT NAME", "Type name and press ENTER", function(txt)
     searchTerm = txt
+    if txt ~= "" then
+        stealBrainrot(txt)
+    end
 end)
 
 SectionSteal:NewButton("GO FIND! ✅", "Searches for that brainrot", function()
@@ -65,7 +88,10 @@ SectionSteal:NewButton("GO FIND! ✅", "Searches for that brainrot", function()
     end
 end)
 
-SectionSteal:NewButton("Steal Garama", "Steals that brainrot", function() stealBrainrot("garama and madundung") end)
-SectionSteal:NewButton("Steal Los Matteos", "Steals that brainrot", function() stealBrainrot("los matteos") end)
-SectionSteal:NewButton("Steal Secret Block", "Steals that brainrot", function() stealBrainrot("secret lucky block") end)
-SectionSteal:NewButton("Steal God Block", "Steals that brainrot", function() stealBrainrot("brainrot god lucky block") end)
+SectionSteal:NewButton("Steal Garama", "Steals that brainrot", function() 
+    stealBrainrot("garama and madundung") 
+end)
+
+SectionSteal:NewButton("Steal Los Matteos", "Steals that brainrot", function() 
+    stealBrainrot("los matteos") 
+end)
