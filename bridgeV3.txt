@@ -1,0 +1,130 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ZanoLeafVN/KavoMobileUI/main/KavoMobile.lua"))()
+
+local Window = Library.CreateLib("OreoHub - Bridge To Brainrot", "DarkTheme")
+local Tab = Window:NewTab("Main")
+
+local SectionSteal = Tab:NewSection("Steals Brainrots")
+
+SectionSteal:NewLabel("BETA VERSION")
+
+local TweenService = game:GetService("TweenService")
+
+local TweenService = game:GetService("TweenService")
+
+SectionSteal:NewButton("Steal Garama", "Steals that brainrot", function()
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    local hrp = character and character:FindFirstChild("HumanoidRootPart")
+    
+    if not hrp then return end
+
+    -- 1. Save original position
+    local originalCFrame = hrp.CFrame
+
+    -- 2. Find matching prompts with both specific text requirements
+    local SMALL_TEXT = "garama and madundung"
+    local NORMAL_TEXT = "grab" -- Case-insensitive check for "Grab"
+    
+    local matches = {}
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("ProximityPrompt") then
+            local objText = string.lower(obj.ObjectText)
+            local actText = string.lower(obj.ActionText)
+            
+            if objText == SMALL_TEXT and actText == NORMAL_TEXT then
+                table.insert(matches, obj)
+            end
+        end
+    end
+
+    if #matches > 0 then
+        local randomPrompt = matches[math.random(1, #matches)]
+        local targetPart = randomPrompt.Parent
+        if not targetPart:IsA("BasePart") then return end
+
+        -- 3. Smooth TP to the prompt
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local goal = {CFrame = targetPart.CFrame * CFrame.new(0, 3, 0)}
+        local tween = TweenService:Create(hrp, tweenInfo, goal)
+        
+        tween:Play()
+        tween.Completed:Wait()
+
+        -- 4. Freeze when you arrive
+        hrp.Anchored = true
+        
+        -- 5. Use the prompt
+        task.wait(0.1)
+        randomPrompt:InputHoldBegin()
+        task.wait(randomPrompt.HoldDuration)
+        randomPrompt:InputHoldEnd()
+        
+        -- 6. Buffer wait, then return
+        task.wait(1)
+        hrp.Anchored = false
+        hrp.CFrame = originalCFrame
+        
+        print("Grabbed the Garama and returned.")
+    else
+        print("No prompts found with Small Text: '" .. SMALL_TEXT .. "' and Action Text: '" .. NORMAL_TEXT .. "'")
+    end
+end)
+
+SectionSteal:NewButton("Steal Los Matteos", "Steals that brainrot", function()
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    local hrp = character and character:FindFirstChild("HumanoidRootPart")
+    
+    if not hrp then return end
+
+    -- 1. Save original position
+    local originalCFrame = hrp.CFrame
+
+    -- 2. Find matching prompts with both specific text requirements
+    local SMALL_TEXT = "los matteos"
+    local NORMAL_TEXT = "grab" -- Case-insensitive check for "Grab"
+    
+    local matches = {}
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("ProximityPrompt") then
+            local objText = string.lower(obj.ObjectText)
+            local actText = string.lower(obj.ActionText)
+            
+            if objText == SMALL_TEXT and actText == NORMAL_TEXT then
+                table.insert(matches, obj)
+            end
+        end
+    end
+
+    if #matches > 0 then
+        local randomPrompt = matches[math.random(1, #matches)]
+        local targetPart = randomPrompt.Parent
+        if not targetPart:IsA("BasePart") then return end
+
+        -- 3. Smooth TP to the prompt
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local goal = {CFrame = targetPart.CFrame * CFrame.new(0, 3, 0)}
+        local tween = TweenService:Create(hrp, tweenInfo, goal)
+        
+        tween:Play()
+        tween.Completed:Wait()
+
+        -- 4. Freeze when you arrive
+        hrp.Anchored = true
+        
+        -- 5. Use the prompt
+        task.wait(0.1)
+        randomPrompt:InputHoldBegin()
+        task.wait(randomPrompt.HoldDuration)
+        randomPrompt:InputHoldEnd()
+        
+        -- 6. Buffer wait, then return
+        task.wait(1)
+        hrp.Anchored = false
+        hrp.CFrame = originalCFrame
+        
+        print("Grabbed the Garama and returned.")
+    else
+        print("No prompts found with Small Text: '" .. SMALL_TEXT .. "' and Action Text: '" .. NORMAL_TEXT .. "'")
+    end
+end)
