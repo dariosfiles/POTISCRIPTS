@@ -1,5 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ZanoLeafVN/KavoMobileUI/main/KavoMobile.lua"))()
-local Window = Library.CreateLib("OreoHub - Bridge To Brainrot [v3]", "Ocean")
+local Window = Library.CreateLib("Bridge For Brainrots", "BloodTheme")
 
 -- Services
 local TweenService = game:GetService("TweenService")
