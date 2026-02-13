@@ -1,0 +1,62 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ZanoLeafVN/KavoMobileUI/main/KavoMobile.lua"))()
+
+local Window = Library.CreateLib("OreoHub - Bridge To Brainrot", "DarkTheme")
+local Tab = Window:NewTab("Main")
+
+local SectionSteal = Tab:NewSection("Steals Brainrots")
+
+SectionSteal:NewLabel("BETA VERSION")
+
+SectionSteal:NewButton("Steal Garama", "Steals that brainrot", function()
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    local hrp = character and character:FindFirstChild("HumanoidRootPart")
+    
+    if not hrp then return end
+
+    -- 1. Save the original position
+    local originalCFrame = hrp.CFrame
+
+    -- 2. Find matching prompts (looking through all folders/descendants)
+    local TARGET_TEXT = "garama and madundung"
+    local matches = {}
+    
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("ProximityPrompt") then
+            if string.lower(obj.ObjectText) == TARGET_TEXT then
+                table.insert(matches, obj)
+            end
+        end
+    end
+
+    -- 3. Execution
+    if #matches > 0 then
+        local randomPrompt = matches[math.random(1, #matches)]
+        local targetPart = randomPrompt.Parent
+
+        if targetPart:IsA("BasePart") then
+            -- Freeze and Teleport
+            hrp.Anchored = true
+            hrp.CFrame = targetPart.CFrame * CFrame.new(0, 3, 0)
+            
+            -- Start interaction
+            task.wait(0.2)
+            randomPrompt:InputHoldBegin()
+            
+            -- Wait for the bar to fill
+            task.wait(randomPrompt.HoldDuration)
+            randomPrompt:InputHoldEnd()
+            
+            -- 4. THE FIX: Wait an extra second to make sure it finishes
+            task.wait(1) 
+            
+            -- Return home
+            hrp.Anchored = false
+            hrp.CFrame = originalCFrame
+            
+            print("Finished interaction and returned.")
+        end
+    else
+        print("No prompts found.")
+    end
+end)
