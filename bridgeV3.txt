@@ -77,7 +77,21 @@ end
 -- Tab 1: Presets
 local Tab = Window:NewTab("🎯 Stealing")
 local SectionSteal = Tab:NewSection("Steals Brainrots")
-SectionSteal:NewLabel("BETA VERSION")
+SectionSteal:NewLabel("MANUAL FIND:")
+
+SectionSteal:NewTextBox("🧠 BRAINROT NAME", "Type here the brainrot to search", function(txt)
+    searchTerm = txt
+end)
+
+SectionSteal:NewButton("GO FIND! ✅", "Searches for that brainrot", function()
+    if searchTerm ~= "" then
+        stealBrainrot(searchTerm)
+    else
+        print("TextBox is empty!")
+    end
+end)
+
+SectionSteal:NewLabel("PREMADE:")
 
 SectionSteal:NewButton("Steal Garama", "Steals that brainrot", function()
     stealBrainrot("garama and madundung")
@@ -93,22 +107,6 @@ end)
 
 SectionSteal:NewButton("Steal God Block", "Steals that brainrot", function()
     stealBrainrot("brainrot god lucky block")
-end)
-
-local ManualFind = Window:NewTab("🔍 FIND")
-
-local Sectionfind = ManualFind:NewSection("HERE YOU TYPE THEM URSELF")
-
-SectionFind:NewTextBox("BRAINROT NAME", "Type here the brainrot to search", function(txt)
-    searchTerm = txt
-end)
-
-SectionFind:NewButton("GO FIND! ✅", "Searches for that brainrot", function()
-    if searchTerm ~= "" then
-        stealBrainrot(searchTerm)
-    else
-        print("TextBox is empty!")
-    end
 end)
 
 local Credits = Window:NewTab("📜 CREDITS")
