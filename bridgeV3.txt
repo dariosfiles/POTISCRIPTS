@@ -95,15 +95,11 @@ SectionSteal:NewButton("Steal God Block", "Steals that brainrot", function()
     stealBrainrot("brainrot god lucky block")
 end)
 
--- Tab 2: Custom Search (Fixed Name so it shows up)
-local TabBox = Window:NewTab("Custom Search")
-local SectionStealBox = TabBox:NewSection("Manual Finder")
-
-SectionStealBox:NewTextBox("BRAINROT NAME", "Type here the brainrot to search", function(txt)
+SectionSteal:NewTextBox("BRAINROT NAME", "Type here the brainrot to search", function(txt)
     searchTerm = txt
 end)
 
-SectionStealBox:NewButton("GO FIND! ✅", "Searches for that brainrot", function()
+SectionSteal:NewButton("GO FIND! ✅", "Searches for that brainrot", function()
     if searchTerm ~= "" then
         stealBrainrot(searchTerm)
     else
