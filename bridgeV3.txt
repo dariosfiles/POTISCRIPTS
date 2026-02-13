@@ -55,21 +55,17 @@ local Tab = Window:NewTab("Stealing")
 local SectionSteal = Tab:NewSection("Steals Brainrots")
 SectionSteal:NewLabel("BETA VERSION")
 
-SectionSteal:NewButton("Steal Garama", "Steals that brainrot", function() stealBrainrot("garama and madundung") end)
-SectionSteal:NewButton("Steal Los Matteos", "Steals that brainrot", function() stealBrainrot("los matteos") end)
-SectionSteal:NewButton("Steal Secret Block", "Steals that brainrot", function() stealBrainrot("secret lucky block") end)
-SectionSteal:NewButton("Steal God Block", "Steals that brainrot", function() stealBrainrot("brainrot god lucky block") end)
-
--- TAB 2: CUSTOM SEARCH (FIXED NAME)
-local TabBox = Window:NewTab("Custom Search") 
-local SectionStealBox = TabBox:NewSection("Manual Finder")
-
-SectionStealBox:NewTextBox("BRAINROT NAME", "Type here the brainrot to search", function(txt)
+SectionSteal:NewTextBox("BRAINROT NAME", "Type here the brainrot to search", function(txt)
     searchTerm = txt
 end)
 
-SectionStealBox:NewButton("GO FIND! ✅", "Searches for that brainrot", function()
+SectionSteal:NewButton("GO FIND! ✅", "Searches for that brainrot", function()
     if searchTerm ~= "" then
         stealBrainrot(searchTerm)
     end
 end)
+
+SectionSteal:NewButton("Steal Garama", "Steals that brainrot", function() stealBrainrot("garama and madundung") end)
+SectionSteal:NewButton("Steal Los Matteos", "Steals that brainrot", function() stealBrainrot("los matteos") end)
+SectionSteal:NewButton("Steal Secret Block", "Steals that brainrot", function() stealBrainrot("secret lucky block") end)
+SectionSteal:NewButton("Steal God Block", "Steals that brainrot", function() stealBrainrot("brainrot god lucky block") end)
