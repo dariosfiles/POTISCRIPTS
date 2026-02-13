@@ -246,3 +246,78 @@ SectionSteal:NewButton("Steal God Block", "Steals that brainrot", function()
         print("No prompts found with Small Text: '" .. SMALL_TEXT .. "' and Action Text: '" .. NORMAL_TEXT .. "'")
     end
 end)
+
+local TabBox = Window:NewTab("")
+
+local SectionStealBox = TabBox:NewSection("Steals Brainrots")
+
+local TweenService = game:GetService("TweenService")
+local searchTerm = "" -- This will store what you type
+
+-- 1. The TextBox: Updates the 'searchTerm' variable
+SectionStealBox:NewTextBox("BRAINROT NAME", "Type here the brainrot to search", function(txt)
+    searchTerm = string.lower(txt) -- Store it in lowercase for easier matching
+end)
+
+-- 2. The Button: Uses the current 'searchTerm'
+SectionStealBox:NewButton("GO FIND! ✅", "Searches for that brainrot", function()
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    local hrp = character and character:FindFirstChild("HumanoidRootPart")
+    
+    if not hrp or searchTerm == "" then 
+        print("Please enter a name in the textbox first!")
+        return 
+    end
+
+    -- Save original position
+    local originalCFrame = hrp.CFrame
+
+    -- Find matching prompts based on TextBox input
+    local NORMAL_TEXT = "grab" 
+    local matches = {}
+
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("ProximityPrompt") then
+            local objText = string.lower(obj.ObjectText)
+            local actText = string.lower(obj.ActionText)
+            
+            -- Check if Small Text matches TextBox AND Action Text is "grab"
+            if objText == searchTerm and actText == NORMAL_TEXT then
+                table.insert(matches, obj)
+            end
+        end
+    end
+
+    if #matches > 0 then
+        local randomPrompt = matches[math.random(1, #matches)]
+        local targetPart = randomPrompt.Parent
+        if not targetPart:IsA("BasePart") then return end
+
+        -- Smooth TP to the prompt
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local goal = {CFrame = targetPart.CFrame * CFrame.new(0, 3, 0)}
+        local tween = TweenService:Create(hrp, tweenInfo, goal)
+        
+        tween:Play()
+        tween.Completed:Wait()
+
+        -- Freeze when you arrive
+        hrp.Anchored = true
+        
+        -- Use the prompt
+        task.wait(0.1)
+        randomPrompt:InputHoldBegin()
+        task.wait(randomPrompt.HoldDuration)
+        randomPrompt:InputHoldEnd()
+        
+        -- Buffer wait, then return
+        task.wait(1)
+        hrp.Anchored = false
+        hrp.CFrame = originalCFrame
+        
+        print("Successfully found and grabbed: " .. searchTerm)
+    else
+        print("No prompts found matching: " .. searchTerm)
+    end
+end)
