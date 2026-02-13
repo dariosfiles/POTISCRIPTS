@@ -79,12 +79,12 @@ local Tab = Window:NewTab("🎯 Stealing")
 local SectionSteal = Tab:NewSection("Steals Brainrots")
 SectionSteal:NewLabel("MANUAL FIND:")
 
-SectionSteal:NewTextBox("🧠 BRAINROT NAME", "Type here the brainrot to search", function(txt)
-    searchTerm = txt
-end)
-
-SectionSteal:NewButton("GO FIND! ✅", "Searches for that brainrot", function()
-    if searchTerm ~= "" then
+-- Only one element needed now: The TextBox
+SectionStealBox:NewTextBox("🧠 BRAINROT NAME", "Type name and press ENTER to steal", function(txt)
+    -- This code runs ONLY when you press Enter in the textbox
+    if txt ~= "" then
+        searchTerm = txt
+        print("Searching for: " .. searchTerm)
         stealBrainrot(searchTerm)
     else
         print("TextBox is empty!")
