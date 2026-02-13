@@ -1,5 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ZanoLeafVN/KavoMobileUI/main/KavoMobile.lua"))()
-local Window = Library.CreateLib("Bridge For Brainrots", "BloodTheme")
+local Window = Library.CreateLib("Bridge For Brainrot | V4.5", "BloodTheme")
 
 -- Services
 local TweenService = game:GetService("TweenService")
@@ -10,105 +10,66 @@ local player = Players.LocalPlayer
 local searchTerm = ""
 local NORMAL_TEXT = "grab"
 
--- Helper Function: Handles the Smooth TP, Freeze, Interact, and Return
+-- Helper Function (To avoid repeating the same code 5 times)
 local function stealBrainrot(targetSmallText)
     local character = player.Character
     local hrp = character and character:FindFirstChild("HumanoidRootPart")
-    
     if not hrp then return end
 
-    -- 1. Save original position
     local originalCFrame = hrp.CFrame
-
-    -- 2. Search for the prompt (Looks through all folders/descendants)
     local matches = {}
+
     for _, obj in ipairs(workspace:GetDescendants()) do
         if obj:IsA("ProximityPrompt") then
-            local objText = string.lower(obj.ObjectText)
-            local actText = string.lower(obj.ActionText)
-            
-            if objText == string.lower(targetSmallText) and actText == NORMAL_TEXT then
+            if string.lower(obj.ObjectText) == string.lower(targetSmallText) and string.lower(obj.ActionText) == NORMAL_TEXT then
                 table.insert(matches, obj)
             end
         end
     end
 
-    -- 3. Execution logic
     if #matches > 0 then
         local randomPrompt = matches[math.random(1, #matches)]
         local targetPart = randomPrompt.Parent
-        
-        if targetPart:IsA("BasePart") then
-            -- Smooth TP (0.3 seconds)
-            local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-            local goal = {CFrame = targetPart.CFrame * CFrame.new(0, 3, 0)}
-            local tween = TweenService:Create(hrp, tweenInfo, goal)
-            
-            tween:Play()
-            tween.Completed:Wait()
+        if not targetPart:IsA("BasePart") then return end
 
-            -- Freeze when you arrive
-            hrp.Anchored = true
-            
-            -- Use the prompt
-            task.wait(0.1)
-            randomPrompt:InputHoldBegin()
-            task.wait(randomPrompt.HoldDuration)
-            randomPrompt:InputHoldEnd()
-            
-            -- Buffer wait so the server registers the grab
-            task.wait(1)
-            
-            -- Return home and unfreeze
-            hrp.Anchored = false
-            hrp.CFrame = originalCFrame
-            
-            print("Successfully processed: " .. targetSmallText)
-        end
+        local tween = TweenService:Create(hrp, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {CFrame = targetPart.CFrame * CFrame.new(0, 3, 0)})
+        tween:Play()
+        tween.Completed:Wait()
+
+        hrp.Anchored = true
+        task.wait(0.1)
+        randomPrompt:InputHoldBegin()
+        task.wait(randomPrompt.HoldDuration)
+        randomPrompt:InputHoldEnd()
+        
+        task.wait(1)
+        hrp.Anchored = false
+        hrp.CFrame = originalCFrame
     else
-        warn("No prompts found for: " .. targetSmallText)
+        print("Not found: " .. targetSmallText)
     end
 end
 
----
---- UI TABS
----
-
--- Tab 1: Presets
-local Tab = Window:NewTab("🎯 Stealing")
+-- TAB 1: PRESETS
+local Tab = Window:NewTab("Stealing")
 local SectionSteal = Tab:NewSection("Steals Brainrots")
-SectionSteal:NewLabel("MANUAL FIND:")
+SectionSteal:NewLabel("BETA VERSION")
 
--- Only one element needed now: The TextBox
-SectionStealBox:NewTextBox("🧠 BRAINROT NAME", "Type name and press ENTER to steal", function(txt)
-    -- This code runs ONLY when you press Enter in the textbox
-    if txt ~= "" then
-        searchTerm = txt
-        print("Searching for: " .. searchTerm)
+SectionSteal:NewButton("Steal Garama", "Steals that brainrot", function() stealBrainrot("garama and madundung") end)
+SectionSteal:NewButton("Steal Los Matteos", "Steals that brainrot", function() stealBrainrot("los matteos") end)
+SectionSteal:NewButton("Steal Secret Block", "Steals that brainrot", function() stealBrainrot("secret lucky block") end)
+SectionSteal:NewButton("Steal God Block", "Steals that brainrot", function() stealBrainrot("brainrot god lucky block") end)
+
+-- TAB 2: CUSTOM SEARCH (FIXED NAME)
+local TabBox = Window:NewTab("Custom Search") 
+local SectionStealBox = TabBox:NewSection("Manual Finder")
+
+SectionStealBox:NewTextBox("BRAINROT NAME", "Type here the brainrot to search", function(txt)
+    searchTerm = txt
+end)
+
+SectionStealBox:NewButton("GO FIND! ✅", "Searches for that brainrot", function()
+    if searchTerm ~= "" then
         stealBrainrot(searchTerm)
-    else
-        print("TextBox is empty!")
     end
 end)
-
-SectionSteal:NewLabel("PREMADE:")
-
-SectionSteal:NewButton("Steal Garama", "Steals that brainrot", function()
-    stealBrainrot("garama and madundung")
-end)
-
-SectionSteal:NewButton("Steal Los Matteos", "Steals that brainrot", function()
-    stealBrainrot("los matteos")
-end)
-
-SectionSteal:NewButton("Steal Secret Block", "Steals that brainrot", function()
-    stealBrainrot("secret lucky block")
-end)
-
-SectionSteal:NewButton("Steal God Block", "Steals that brainrot", function()
-    stealBrainrot("brainrot god lucky block")
-end)
-
-local Credits = Window:NewTab("📜 CREDITS")
-
-local SectionCr = Credits:NewSection("Developer: ventanita_mango")
