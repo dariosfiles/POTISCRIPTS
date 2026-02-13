@@ -106,3 +106,7 @@ SectionSteal:NewButton("GO FIND! ✅", "Searches for that brainrot", function()
         print("TextBox is empty!")
     end
 end)
+
+local Credits = Window:NewTab("📜 CREDITS")
+
+local SectionCr = Credits:NewSection("Developer: ventanita_mango")
