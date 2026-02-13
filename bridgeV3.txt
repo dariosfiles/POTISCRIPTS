@@ -75,7 +75,7 @@ end
 ---
 
 -- Tab 1: Presets
-local Tab = Window:NewTab("Stealing")
+local Tab = Window:NewTab("🎯 Stealing")
 local SectionSteal = Tab:NewSection("Steals Brainrots")
 SectionSteal:NewLabel("BETA VERSION")
 
