@@ -92,6 +92,10 @@ SectionSteal:NewButton("Steal Garama", "Steals that brainrot", function()
     stealBrainrot("garama and madundung") 
 end)
 
+SectionSteal:NewButton("Steal Dul Dul Dul", "Steals that brainrot", function() 
+    stealBrainrot("dul dul dul") 
+end)
+
 SectionSteal:NewButton("Steal Los Matteos", "Steals that brainrot", function() 
     stealBrainrot("los matteos") 
 end)
