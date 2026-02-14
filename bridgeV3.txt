@@ -3,7 +3,7 @@ if game:GetService("CoreGui"):FindFirstChild("BridgeToggleGui") then
     game:GetService("CoreGui").BridgeToggleGui:Destroy()
 end
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ZanoLeafVN/KavoMobileUI/main/KavoMobile.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/dariosfiles/POTISCRIPTS/refs/heads/main/kavoui-forme.txt"))()
 local Window = Library.CreateLib("Bridge For Brainrot | V4.5", "BloodTheme")
 
 -- Services
