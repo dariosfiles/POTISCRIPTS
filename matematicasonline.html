@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minijuego de Precisión e Inventario</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e24;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        /* Zona de Juego Principal */
+        #game-area {
+            flex: 2;
+            background-color: #2a2a35;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            position: relative;
+            min-height: 400px;
+        }
+
+        /* Personas (Objetivos) */
+        .person {
+            width: 80px;
+            height: 80px;
+            background-color: #ff758f;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            margin: 20px;
+            user-select: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .person:hover { transform: scale(1.1); }
+        .person:active { transform: scale(0.95); }
+
+        /* Barra de Precisión */
+        #bar-container {
+            width: 80%;
+            height: 30px;
+            background-color: #444;
+            margin: 30px auto;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            display: none;
+            border: 2px solid #555;
+        }
+        #green-zone {
+            width: 20%;
+            height: 100%;
+            background-color: #2ec4b6;
+            position: absolute;
+            left: 40%; /* Zona objetivo en el centro */
+        }
+        #indicator {
+            width: 6px;
+            height: 100%;
+            background-color: #ff9f1c;
+            position: absolute;
+            left: 0%;
+            box-shadow: 0 0 8px #ff9f1c;
+        }
+
+        /* Inventario y Stats */
+        #sidebar {
+            flex: 1;
+            background-color: #25252b;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        .stat-box {
+            font-size: 18px;
+            background: #343440;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 5px solid #e63946;
+        }
+        #inventory-list {
+            flex-grow: 1;
+            background: #1a1a22;
+            border-radius: 8px;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .inv-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 10px;
+            margin-bottom: 5px;
+            background: #2a2a35;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* Botones y UI Modular (Jairopop) */
+        .btn {
+            background-color: #e63946;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+        .btn:hover { background-color: #ff4d5a; }
+
+        #jairopop-ui {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #2b2d42;
+            border: 3px solid #ef233c;
+            border-radius: 15px;
+            padding: 30px;
+            z-index: 100;
+            box-shadow: 0 0 30px rgba(0,0,0,0.7);
+            text-align: center;
+            min-width: 300px;
+        }
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 99;
+        }
+
+        /* Notificaciones de feedback */
+        #feedback {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+            height: 25px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-area">
+        <h2>¡Haz clic en una persona para interactuar!</h2>
+        <div id="people-container">
+            </div>
+
+        <div id="bar-container">
+            <div id="green-zone"></div>
+            <div id="indicator"></div>
+        </div>
+        <p id="instruction" style="display:none; color: #aaa;">¡Presiona <strong>ESPACIO</strong> cuando la barra naranja esté en lo verde!</p>
+        <div id="feedback"></div>
+    </div>
+
+    <div id="sidebar">
+        <div class="stat-box">Dinero: <span id="stat-money" style="color: #4caf50; font-weight: bold;">0</span> €</div>
+        <div class="stat-box">Valor Total Inv.: <span id="stat-value" style="color: #ffb703;">0</span> €</div>
+        
+        <h3>Tu Inventario</h3>
+        <div id="inventory-list">
+            </div>
+
+        <button class="btn" onclick="toggleJairopop(true)">Abrir Jairopop</button>
+    </div>
+
+    <div id="overlay" onclick="toggleJairopop(false)"></div>
+    <div id="jairopop-ui">
+        <h2>🏪 Tienda Jairopop 🏪</h2>
+        <p>¿Quieres vender todo tu inventario actual?</p>
+        <p style="font-size: 14px; color: #ccc;">Te llevarás el valor total acumulado.</p>
+        <button class="btn" onclick="sellAllItems()" style="background-color: #4caf50;">Vender Todo</button>
+        <button class="btn" onclick="toggleJairopop(false)" style="background-color: #6c757d;">Cerrar</button>
+    </div>
+
+    <script>
+        // --- BASE DE DATOS DE ÍTEMS (Muchos ítems variados) ---
+        const itemPool = [
+            { name: "🪨 Piedra Común", price: 5 },
+            { name: "🪙 Moneda Oxidada", price: 10 },
+            { name: "🍎 Manzana Mordida", price: 15 },
+            { name: "👟 Zapatilla Vieja", price: 25 },
+            { name: "🕶️ Gafas Molonas", price: 50 },
+            { name: "💍 Anillo de Cobre", price: 75 },
+            { name: "🎒 Mochila Escolar", price: 100 },
+            { name: "📱 Teléfono Antiguo", price: 180 },
+            { name: "🎧 Cascos Gamer", price: 250 },
+            { name: "🛹 Monopatín Pro", price: 350 },
+            { name: "🎮 Consola Portátil", price: 500 },
+            { name: "💻 Portátil Gamer", price: 1200 },
+            { name: "💎 Diamante Reluciente", price: 2500 },
+            { name: "👑 Corona Real", price: 5000 },
+            { name: "🏎️ Coche Deportivo", price: 15000 }
+        ];
+
+        // --- ESTADO DEL JUEGO ---
+        let money = 0;
+        let inventory = [];
+        let isPlayingMinigame = false;
+        let indicatorPos = 0;
+        let indicatorDirection = 1;
+        let minigameInterval;
+        const speed = 3; // Velocidad de la barra
+
+        // Configuración de la zona verde (En porcentaje de 0 a 100)
+        const greenZoneLeft = 40;
+        const greenZoneWidth = 20;
+
+        // --- INICIALIZACIÓN ---
+        const container = document.getElementById('people-container');
+        const emojis = ['🧑‍🦱', '👩', '👨', '🧑‍🎨', '🕵️', '🧑‍🚀', '🐱'];
+
+        function spawnPeople() {
+            container.innerHTML = '';
+            // Genera 3 personas al azar
+            for (let i = 0; i < 3; i++) {
+                let p = document.createElement('div');
+                p.className = 'person';
+                p.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                p.onclick = startMinigame;
+                container.appendChild(p);
+            }
+        }
+
+        // --- LÓGICA DEL MINIJUEGO ---
+        function startMinigame() {
+            if (isPlayingMinigame) return;
+            isPlayingMinigame = true;
+            
+            document.getElementById('bar-container').style.display = 'block';
+            document.getElementById('instruction').style.display = 'block';
+            document.getElementById('feedback').innerHTML = '';
+            
+            indicatorPos = 0;
+            indicatorDirection = 1;
+
+            // Bucle de movimiento del indicador naranja
+            minigameInterval = setInterval(() => {
+                indicatorPos += speed * indicatorDirection;
+                if (indicatorPos >= 100) {
+                    indicatorPos = 100;
+                    indicatorDirection = -1;
+                } else if (indicatorPos <= 0) {
+                    indicatorPos = 0;
+                    indicatorDirection = 1;
+                }
+                document.getElementById('indicator').style.styleLeft = indicatorPos + '%'; // Fix alternativo cross-browser
+                document.getElementById('indicator').style.left = indicatorPos + '%';
+            }, 16);
+        }
+
+        // Detectar Tecla Espacio
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && isPlayingMinigame) {
+                e.preventDefault(); // Evita scroll de pantalla
+                stopMinigame();
+            }
+        });
+
+        function stopMinigame() {
+            clearInterval(minigameInterval);
+            isPlayingMinigame = false;
+
+            document.getElementById('bar-container').style.display = 'none';
+            document.getElementById('instruction').style.display = 'none';
+
+            // Comprobar si está dentro del rango verde
+            if (indicatorPos >= greenZoneLeft && indicatorPos <= (greenZoneLeft + greenZoneWidth)) {
+                // ÉXITO -> Da ítem aleatorio
+                const randomItem = itemPool[Math.floor(Math.random() * itemPool.length)];
+                inventory.push(randomItem);
+                
+                document.getElementById('feedback').innerHTML = `🎉 ¡Perfecto! Conseguiste: <strong>${randomItem.name}</strong>`;
+                document.getElementById('feedback').style.color = '#2ec4b6';
+                
+                updateUI();
+            } else {
+                // FALLO
+                document.getElementById('feedback').innerHTML = "❌ ¡Fallaste! Más precisión la próxima vez.";
+                document.getElementById('feedback').style.color = '#e63946';
+            }
+
+            // Cambiar las personas para la siguiente ronda
+            spawnPeople();
+        }
+
+        // --- SISTEMA DE INVENTARIO Y DINERO ---
+        function updateUI() {
+            // Dinero
+            document.getElementById('stat-money').innerText = money;
+
+            // Lista de inventario
+            const invList = document.getElementById('inventory-list');
+            invList.innerHTML = '';
+            
+            let totalValue = 0;
+            inventory.forEach((item) => {
+                totalValue += item.price;
+                
+                let div = document.createElement('div');
+                div.className = 'inv-item';
+                div.innerHTML = `<span>${item.name}</span> <span>${item.price} €</span>`;
+                invList.appendChild(div);
+            });
+
+            // Valor Total
+            document.getElementById('stat-value').innerText = totalValue;
+        }
+
+        // --- UI DE JAIROPOP ---
+        function toggleJairopop(show) {
+            document.getElementById('jairopop-ui').style.display = show ? 'block' : 'none';
+            document.getElementById('overlay').style.display = show ? 'block' : 'none';
+        }
+
+        function sellAllItems() {
+            if (inventory.length === 0) {
+                alert("¡No tienes nada que vender en Jairopop!");
+                toggleJairopop(false);
+                return;
+            }
+
+            // Calcular ganancias
+            let totalProfit = inventory.reduce((sum, item) => sum + item.price, 0);
+            money += totalProfit;
+            inventory = []; // Limpiar inventario
+
+            updateUI();
+            toggleJairopop(false);
+            document.getElementById('feedback').innerHTML = `💰 ¡Vendiste todo en Jairopop por +${totalProfit} €!`;
+            document.getElementById('feedback').style.color = '#ff9f1c';
+        }
+
+        // Iniciar el juego por primera vez
+        spawnPeople();
+        updateUI();
+    </script>
+</body>
+</html>
